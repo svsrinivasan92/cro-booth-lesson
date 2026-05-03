@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRO Dashboard — Srinivasan Vaidyanathan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --indigo:#1a1464; --indigo-mid:#2d2490; --magenta:#e5007d; --magenta-light:#ff4db2;
+    --cream:#f5f3ee; --white:#ffffff; --slate:#3d3d5c; --slate-light:#6e6e8a;
+    --green:#00c48c; --yellow:#ffb800; --red:#ff4444;
+    --card-bg:#ffffff; --border:rgba(26,20,100,0.08); --shadow:0 2px 20px rgba(26,20,100,0.07);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--indigo); }
+
+  /* HEADER */
+  header { background:var(--indigo); padding:0 40px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; }
+  .header-right { display:flex; align-items:center; gap:20px; }
+  .period-badge { font-family:'DM Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase; }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(0,196,140,0.2); animation:pulse 2s infinite; }
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(0,196,140,0.2)}50%{box-shadow:0 0 0 6px rgba(0,196,140,0.1)}}
+
+  /* TOGGLE */
+  .view-toggle { display:flex; background:rgba(255,255,255,0.1); border-radius:20px; padding:3px; gap:2px; }
+  .toggle-btn { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase; padding:5px 12px; border-radius:16px; border:none; cursor:pointer; color:rgba(255,255,255,0.5); background:transparent; transition:all .2s; }
+  .toggle-btn.active { background:var(--magenta); color:#fff; }
+
+  /* HERO */
+  .hero { background:linear-gradient(135deg,var(--indigo) 0%,var(--indigo-mid) 100%); padding:28px 40px 24px; position:relative; overflow:hidden; }
+  .hero::after { content:''; position:absolute; right:-60px; top:-60px; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(229,0,125,0.15) 0%,transparent 70%); pointer-events:none; }
+  .hero-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--magenta-light); margin-bottom:6px; }
+  .hero-title { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--white); letter-spacing:-0.5px; margin-bottom:4px; }
+  .hero-sub { font-size:13px; color:rgba(255,255,255,0.45); font-weight:300; }
+
+  /* RAG BANNER */
+  .rag-banner { display:flex; align-items:center; gap:0; background:var(--card-bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); opacity:0; animation:fadeUp .4s ease forwards; animation-delay:.05s; }
+  .rag-item { flex:1; display:flex; align-items:center; gap:12px; padding:14px 20px; border-right:1px solid var(--border); cursor:default; transition:background .15s; }
+  .rag-item:last-child { border-right:none; }
+  .rag-item:hover { background:rgba(26,20,100,0.02); }
+  .rag-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .rag-dot.green{background:var(--green)} .rag-dot.yellow{background:var(--yellow)} .rag-dot.red{background:var(--red)}
+  .rag-count { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; line-height:1; }
+  .rag-count.green{color:var(--green)} .rag-count.yellow{color:var(--yellow)} .rag-count.red{color:var(--red)}
+  .rag-info { display:flex; flex-direction:column; }
+  .rag-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--slate-light); }
+  .rag-sub { font-size:11px; color:var(--slate); margin-top:1px; }
+  .rag-divider { width:1px; background:var(--border); align-self:stretch; }
+
+  main { padding:20px 40px 48px; max-width:1400px; margin:0 auto; }
+  .section-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--slate-light); margin-bottom:14px; margin-top:28px; display:flex; align-items:center; gap:10px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+  .kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+  /* KPI CARDS */
+  .kpi-card { background:var(--card-bg); border-radius:12px; padding:22px 24px; border:1px solid var(--border); box-shadow:var(--shadow); position:relative; overflow:hidden; opacity:0; transform:translateY(16px); animation:fadeUp .5s ease forwards; }
+  .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .kpi-card.on-track::before{background:var(--green)} .kpi-card.at-risk::before{background:var(--yellow)} .kpi-card.off-track::before{background:var(--red)}
+  .kpi-header-row { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
+  .kpi-name { font-size:11px; font-weight:500; color:var(--slate-light); letter-spacing:.3px; text-transform:uppercase; font-family:'DM Mono',monospace; }
+  .trend-arrow { font-size:14px; font-weight:700; line-height:1; }
+  .trend-up{color:var(--green)} .trend-down{color:var(--red)} .trend-flat{color:var(--slate-light)}
+  .kpi-actual { font-family:'Syne',sans-serif; font-size:32px; font-weight:700; color:var(--indigo); line-height:1; margin-bottom:4px; letter-spacing:-1px; }
+  .kpi-target-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .kpi-target { font-size:12px; color:var(--slate-light); }
+  .kpi-target span { color:var(--slate); font-weight:500; }
+  .status-pill { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; padding:3px 8px; border-radius:20px; font-weight:500; }
+  .on-track .status-pill{background:rgba(0,196,140,0.1);color:var(--green)} .at-risk .status-pill{background:rgba(255,184,0,0.1);color:#d49700} .off-track .status-pill{background:rgba(255,68,68,0.1);color:var(--red)}
+  .progress-track { height:5px; background:rgba(26,20,100,0.07); border-radius:10px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:10px; transition:width 1.2s cubic-bezier(.4,0,.2,1); width:0; }
+  .on-track .progress-fill{background:var(--green)} .at-risk .progress-fill{background:var(--yellow)} .off-track .progress-fill{background:var(--red)}
+  .kpi-note { font-size:10px; color:var(--slate-light); margin-top:8px; font-style:italic; line-height:1.4; }
+  .kpi-card.hidden { display:none; }
+
+  /* CHARTS */
+  .chart-row { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:16px; margin-top:16px; }
+  .chart-card { background:var(--card-bg); border-radius:12px; padding:24px; border:1px solid var(--border); box-shadow:var(--shadow); opacity:0; transform:translateY(16px); animation:fadeUp .5s ease forwards; }
+  .chart-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--indigo); margin-bottom:4px; }
+  .chart-sub { font-size:11px; color:var(--slate-light); margin-bottom:20px; }
+  .chart-wrap { position:relative; height:190px; }
+
+  /* CONCENTRATION BARS */
+  .conc-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; margin-top:12px; position:relative; }
+  .conc-label { font-family:'DM Mono',monospace; font-size:10px; color:var(--slate); width:28px; flex-shrink:0; }
+  .conc-track { flex:1; height:8px; background:rgba(26,20,100,0.07); border-radius:10px; overflow:visible; position:relative; }
+  .conc-fill { height:100%; border-radius:10px; transition:width 1.2s ease; width:0; position:relative; }
+  .conc-tooltip { display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); background:var(--indigo); color:#fff; font-family:'DM Mono',monospace; font-size:10px; padding:5px 10px; border-radius:6px; white-space:nowrap; z-index:10; pointer-events:none; }
+  .conc-tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:4px solid transparent; border-top-color:var(--indigo); }
+  .conc-row:hover .conc-tooltip { display:block; }
+  .conc-pct { font-family:'DM Mono',monospace; font-size:10px; color:var(--slate-light); width:36px; text-align:right; flex-shrink:0; }
+
+  /* DISCLAIMER */
+  .disclaimer-bar { background:rgba(255,184,0,0.08); border:1px solid rgba(255,184,0,0.3); border-radius:10px; padding:14px 20px; display:flex; gap:14px; align-items:flex-start; margin-bottom:8px; opacity:0; animation:fadeUp .4s ease forwards; animation-delay:.05s; }
+  .disc-icon { font-size:15px; margin-top:1px; flex-shrink:0; }
+  .disc-title { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:#d49700; margin-bottom:3px; text-transform:uppercase; letter-spacing:.5px; }
+  .disc-text { font-size:11px; color:var(--slate); line-height:1.5; }
+
+  /* RATIONALE */
+  .rationale-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:8px; }
+  .rationale-card { background:rgba(26,20,100,0.03); border:1px solid var(--border); border-radius:10px; padding:16px; opacity:0; animation:fadeUp .4s ease forwards; }
+  .rat-label { font-family:'DM Mono',monospace; font-size:10px; font-weight:500; color:var(--magenta); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+  .rat-text { font-size:11.5px; color:var(--slate); line-height:1.6; }
+
+  /* KEY ACTIONS */
+  .actions-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .action-card { background:var(--indigo); border-radius:12px; padding:24px; opacity:0; animation:fadeUp .5s ease forwards; position:relative; overflow:hidden; }
+  .action-card::before { content:''; position:absolute; top:-30px; right:-30px; width:100px; height:100px; border-radius:50%; background:rgba(229,0,125,0.12); }
+  .action-num { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; color:rgba(255,255,255,0.08); line-height:1; margin-bottom:8px; }
+  .action-priority { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; padding:3px 8px; border-radius:12px; display:inline-block; }
+  .action-priority.critical { background:rgba(255,68,68,0.2); color:#ff8080; }
+  .action-priority.high { background:rgba(255,184,0,0.2); color:#ffd060; }
+  .action-priority.medium { background:rgba(0,196,140,0.2); color:#60e8c0; }
+  .action-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#fff; margin-bottom:8px; line-height:1.3; }
+  .action-text { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.6; }
+  .action-metric { font-family:'DM Mono',monospace; font-size:10px; color:var(--magenta-light); margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08); }
+
+  footer { background:var(--indigo); padding:18px 40px; display:flex; align-items:center; justify-content:space-between; margin-top:48px; }
+  .footer-note { font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:-0.3px">Srinivasan Vaidyanathan</div>
+  <div class="header-right">
+    <div class="view-toggle">
+      <button class="toggle-btn active" onclick="setView('all')">All Pipeline</button>
+      <button class="toggle-btn" onclick="setView('committed')">Committed Only</button>
+    </div>
+    <span class="period-badge">FY2026 · Q2</span>
+    <div class="live-dot"></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">Revenue Command Center</div>
+  <div class="hero-title">CRO Dashboard</div>
+  <div class="hero-sub">Hi-Tech Business Vertical · Consulting &amp; AI Services · As of May 3, 2026</div>
+</div>
+
+<main>
+
+  <!-- RAG SUMMARY -->
+  <div style="margin-top:20px;margin-bottom:0">
+    <div class="rag-banner">
+      <div class="rag-item">
+        <div class="rag-dot green"></div>
+        <div class="rag-count green" id="ragGreen">3</div>
+        <div class="rag-info">
+          <div class="rag-label">On Track</div>
+          <div class="rag-sub">Utilization, Retention, Renewals</div>
+        </div>
+      </div>
+      <div class="rag-item">
+        <div class="rag-dot yellow"></div>
+        <div class="rag-count yellow" id="ragAmber">5</div>
+        <div class="rag-info">
+          <div class="rag-label">At Risk</div>
+          <div class="rag-sub">Pipeline, Commit, AI Rate, Deal Size, Accounts</div>
+        </div>
+      </div>
+      <div class="rag-item">
+        <div class="rag-dot red"></div>
+        <div class="rag-count red" id="ragRed">1</div>
+        <div class="rag-info">
+          <div class="rag-label">Off Track</div>
+          <div class="rag-sub">Revenue concentration requires action</div>
+        </div>
+      </div>
+      <div class="rag-item" style="flex:1.5">
+        <div style="width:100%">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--slate-light);letter-spacing:1px;text-transform:uppercase">Overall Health</span>
+            <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--yellow)">Caution</span>
+          </div>
+          <div style="height:6px;background:rgba(26,20,100,0.07);border-radius:10px;overflow:hidden">
+            <div style="height:100%;width:67%;background:linear-gradient(90deg,var(--green),var(--yellow));border-radius:10px"></div>
+          </div>
+          <div style="font-size:10px;color:var(--slate-light);margin-top:4px">3 of 9 metrics at or above target · H2 recovery required</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer-bar" style="margin-top:16px">
+    <span class="disc-icon">⚠</span>
+    <div>
+      <div class="disc-title">Illustrative Dashboard — For Academic Purposes Only</div>
+      <div class="disc-text">All metrics are derived from aggregate portfolio data and directionally calibrated against actual performance. No client names, individual opportunity details, or confidential commercial data are disclosed. Built for the Chicago Booth CRO Executive Program.</div>
+    </div>
+  </div>
+
+  <!-- PIPELINE & BOOKINGS -->
+  <div class="section-label">Pipeline &amp; Bookings</div>
+  <div class="kpi-grid" id="grid1"></div>
+
+  <!-- DELIVERY & EFFICIENCY -->
+  <div class="section-label">Delivery &amp; Efficiency</div>
+  <div class="kpi-grid" id="grid2"></div>
+
+  <!-- PORTFOLIO HEALTH -->
+  <div class="section-label">Portfolio Health</div>
+  <div class="kpi-grid" id="grid3"></div>
+
+  <!-- CHARTS -->
+  <div class="section-label">Trend Analysis</div>
+  <div class="chart-row">
+    <div class="chart-card" style="animation-delay:.5s">
+      <div class="chart-title">Quarterly Revenue Distribution</div>
+      <div class="chart-sub">Pipeline by quarter vs. equal-split target ($M) · Q2 = current quarter</div>
+      <div class="chart-wrap"><canvas id="bookingsChart"></canvas></div>
+    </div>
+    <div class="chart-card" style="animation-delay:.55s">
+      <div class="chart-title">AI Attachment Rate</div>
+      <div class="chart-sub">Accounts with active AI engagements</div>
+      <div class="chart-wrap"><canvas id="aiChart"></canvas></div>
+    </div>
+    <div class="chart-card" style="animation-delay:.6s">
+      <div class="chart-title">Revenue Concentration</div>
+      <div class="chart-sub">Portfolio share by account rank · hover for risk context</div>
+      <div id="concBars"></div>
+    </div>
+  </div>
+
+  <!-- KEY ACTIONS -->
+  <div class="section-label">Key Actions — Q2 2026</div>
+  <div class="actions-grid">
+    <div class="action-card" style="animation-delay:.65s">
+      <div class="action-num">01</div>
+      <div class="action-priority critical">Critical</div>
+      <div class="action-title">Close the pipeline gap before Q2 end</div>
+      <div class="action-text">$5.1M sits between current pipeline commit and the $30M target. Prioritise the 4–5 late-stage opps with verbal approval but unsigned SOWs. Every week of delay shifts revenue into an already loaded Q3.</div>
+      <div class="action-metric">Gap: $7.1M to target · Q2 pipeline: $5.0M</div>
+    </div>
+    <div class="action-card" style="animation-delay:.7s">
+      <div class="action-num">02</div>
+      <div class="action-priority critical">Critical</div>
+      <div class="action-title">Reduce top-account concentration risk</div>
+      <div class="action-text">One account represents 26% of portfolio revenue. Any churn, budget cut, or leadership change at that account is a material event. Initiate 2 new logo conversations in Q2 and accelerate expansion in tier-2 accounts.</div>
+      <div class="action-metric">Current: 54.5% top-3 concentration · Target: &lt;45%</div>
+    </div>
+    <div class="action-card" style="animation-delay:.75s">
+      <div class="action-num">03</div>
+      <div class="action-priority high">High</div>
+      <div class="action-title">Convert AI attachment from 57% to 60%+</div>
+      <div class="action-text">AI engagements are live in 8 of 14 accounts. The remaining 6 are traditional services accounts — each has a natural AI entry point (automation, data, or workflow). Run co-innovation workshops in Q2 to seed the pipeline for H2.</div>
+      <div class="action-metric">AI accounts: 8/14 · Target: 60%+ by Q3</div>
+    </div>
+  </div>
+
+  <!-- RATIONALE -->
+  <div class="section-label">Metric Rationale</div>
+  <div class="rationale-grid" id="rationaleGrid"></div>
+
+</main>
+
+<footer>
+  <span class="footer-note">Srinivasan Vaidyanathan · Chicago Booth CRO Executive Program 2026 · Revenue Strategy &amp; Operations</span>
+  <span class="footer-note">Aggregate data only — no client information disclosed · May 3, 2026</span>
+</footer>
+
+<script>
+// ── VIEW TOGGLE ───────────────────────────────────────────────────────────────
+const allKpis = {
+  grid1: [
+    { name:"Portfolio Revenue vs Target", actual:"$22.9M", committed:"$16.2M", target:"$30.0M", committedTarget:"$18.0M", pct:76, committedPct:90, status:"at-risk", pill:"At Risk", trend:"down", note:"Strong H2 loading — $14.8M in Q3+Q4 pipeline" },
+    { name:"Pipeline Commit (Weighted)", actual:"$16.2M", committed:"$16.2M", target:"$18.0M", committedTarget:"$18.0M", pct:90, committedPct:90, status:"at-risk", pill:"At Risk", trend:"flat", note:"Committed opps at probability ≥ 80%" },
+    { name:"SOW Renewal Rate", actual:"88%", committed:"91%", target:"85%", committedTarget:"85%", pct:100, committedPct:100, status:"on-track", pill:"On Track", trend:"up", note:"Renewal and expansion opps dominate portfolio mix" },
+  ],
+  grid2: [
+    { name:"Billable Utilization", actual:"87%", committed:"87%", target:"85%", committedTarget:"85%", pct:100, committedPct:100, status:"on-track", pill:"On Track", trend:"up", note:"Above target — confirmed across delivery teams" },
+    { name:"AI Attachment Rate", actual:"57%", committed:"57%", target:"60%", committedTarget:"60%", pct:95, committedPct:95, status:"at-risk", pill:"At Risk", trend:"up", note:"8 of 14 accounts have active AI/automation engagements" },
+    { name:"Avg Engagement Size", actual:"$326K", committed:"$380K", target:"$350K", committedTarget:"$350K", pct:93, committedPct:100, status:"at-risk", pill:"At Risk", trend:"flat", note:"70 opportunities across 14 active accounts" },
+  ],
+  grid3: [
+    { name:"Active Accounts", actual:"14", committed:"14", target:"15", committedTarget:"15", pct:93, committedPct:93, status:"at-risk", pill:"At Risk", trend:"flat", note:"Concentrated in enterprise tech — renewal and expansion dominant" },
+    { name:"Account Retention Rate", actual:"92%", committed:"92%", target:"90%", committedTarget:"90%", pct:100, committedPct:100, status:"on-track", pill:"On Track", trend:"up", note:"No confirmed churn — renewal pipeline active across all accounts" },
+    { name:"Revenue Concentration (Top 3)", actual:"54.5%", committed:"54.5%", target:"<45%", committedTarget:"<45%", pct:55, committedPct:55, status:"off-track", pill:"Off Track", trend:"flat", note:"Single largest account = 26% of portfolio — primary risk" },
+  ]
+};
+
+let currentView = 'all';
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  ['grid1','grid2','grid3'].forEach(gid => {
+    const grid = document.getElementById(gid);
+    grid.innerHTML = '';
+    buildGrid(allKpis[gid], gid, view === 'committed');
+  });
+}
+
+function buildGrid(data, gridId, committed) {
+  const grid = document.getElementById(gridId);
+  data.forEach((kpi, i) => {
+    const actual = committed ? kpi.committed : kpi.actual;
+    const target = committed ? kpi.committedTarget : kpi.target;
+    const pct = committed ? kpi.committedPct : kpi.pct;
+    const trendIcon = kpi.trend === 'up' ? '<span class="trend-arrow trend-up">↑</span>' : kpi.trend === 'down' ? '<span class="trend-arrow trend-down">↓</span>' : '<span class="trend-arrow trend-flat">→</span>';
+    const card = document.createElement('div');
+    card.className = `kpi-card ${kpi.status}`;
+    card.style.animationDelay = `${0.05 + i * 0.07}s`;
+    card.innerHTML = `
+      <div class="kpi-header-row">
+        <div class="kpi-name">${kpi.name}</div>
+        ${trendIcon}
+      </div>
+      <div class="kpi-actual">${actual}</div>
+      <div class="kpi-target-row">
+        <div class="kpi-target">Target <span>${target}</span></div>
+        <div class="status-pill">${kpi.pill}</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" data-pct="${pct}"></div></div>
+      <div class="kpi-note">${kpi.note}</div>`;
+    grid.appendChild(card);
+  });
+  setTimeout(() => grid.querySelectorAll('.progress-fill').forEach(b => b.style.width = b.dataset.pct + '%'), 400);
+}
+
+buildGrid(allKpis.grid1, 'grid1', false);
+buildGrid(allKpis.grid2, 'grid2', false);
+buildGrid(allKpis.grid3, 'grid3', false);
+
+// ── QUARTERLY BAR CHART (Q2 highlighted) ─────────────────────────────────────
+new Chart(document.getElementById('bookingsChart').getContext('2d'), {
+  type:'bar',
+  data:{
+    labels:['Q1 2026','Q2 2026 ★','Q3 2026','Q4 2026'],
+    datasets:[
+      { label:'Pipeline ($M)',
+        data:[3.1,5.0,7.9,7.0],
+        backgroundColor:['rgba(26,20,100,0.5)','#e5007d','rgba(26,20,100,0.35)','rgba(26,20,100,0.35)'],
+        borderRadius:5, borderSkipped:false },
+      { label:'Quarterly Target',
+        data:[7.5,7.5,7.5,7.5], type:'line',
+        borderColor:'rgba(26,20,100,0.35)', borderWidth:2, borderDash:[5,4], pointRadius:0, fill:false }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:true,position:'top',labels:{font:{family:'DM Mono',size:9},color:'#6e6e8a',boxWidth:10,padding:12}},
+      tooltip:{callbacks:{label:c=>` $${c.raw}M`}},
+      annotation:{}
+    },
+    scales:{
+      x:{grid:{display:false},ticks:{font:{family:'DM Mono',size:10},color:'#6e6e8a'}},
+      y:{grid:{color:'rgba(26,20,100,0.05)'},ticks:{font:{family:'DM Mono',size:10},color:'#6e6e8a',callback:v=>'$'+v+'M'},max:10}
+    }
+  }
+});
+
+// ── AI DONUT ─────────────────────────────────────────────────────────────────
+new Chart(document.getElementById('aiChart').getContext('2d'), {
+  type:'doughnut',
+  data:{
+    labels:['AI-attached accounts','Traditional services only'],
+    datasets:[{data:[57,43],backgroundColor:['#1a1464','rgba(26,20,100,0.1)'],borderColor:['#1a1464','rgba(26,20,100,0.15)'],borderWidth:1,hoverOffset:6}]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false, cutout:'70%',
+    plugins:{
+      legend:{display:true,position:'bottom',labels:{font:{family:'DM Mono',size:9},color:'#6e6e8a',boxWidth:10,padding:10}},
+      tooltip:{callbacks:{label:c=>` ${c.raw}% of accounts`}}
+    }
+  }
+});
+
+// ── CONCENTRATION BARS WITH TOOLTIPS ────────────────────────────────────────
+const concData=[
+  {label:'#1', pct:26.2, color:'#e5007d',    tooltip:'Largest account · 26.2% of portfolio · Single point of failure risk'},
+  {label:'#2', pct:14.6, color:'#1a1464',    tooltip:'2nd account · 14.6% · Strong renewal pipeline'},
+  {label:'#3', pct:13.7, color:'#2d2490',    tooltip:'3rd account · 13.7% · Active expansion in progress'},
+  {label:'#4', pct:13.0, color:'#4a47a3',    tooltip:'4th account · 13.0% · Renewal due H2 2026'},
+  {label:'Rest',pct:32.5,color:'#6e6e8a',    tooltip:'10 remaining accounts · 32.5% combined · Target: grow this share'},
+];
+const concWrap=document.getElementById('concBars');
+concData.forEach(d=>{
+  const row=document.createElement('div');
+  row.className='conc-row';
+  row.innerHTML=`
+    <div class="conc-label">${d.label}</div>
+    <div class="conc-track">
+      <div class="conc-fill" data-w="${d.pct}" style="background:${d.color}">
+        <div class="conc-tooltip">${d.tooltip}</div>
+      </div>
+    </div>
+    <div class="conc-pct">${d.pct}%</div>`;
+  concWrap.appendChild(row);
+});
+setTimeout(()=>document.querySelectorAll('.conc-fill').forEach(b=>b.style.width=b.dataset.w+'%'),600);
+
+// ── RATIONALE ────────────────────────────────────────────────────────────────
+const rationale=[
+  {label:"Portfolio Revenue $22.9M vs $30M", text:"Strong H2 weighting — $14.8M in Q3+Q4. Common in consulting where enterprise clients approve budgets mid-year. Recoverable if late-stage Q2 opps convert."},
+  {label:"SOW Renewal Rate 88% vs 85%", text:"Portfolio is renewal and expansion heavy. High renewal rate reflects strong delivery relationships — most pipeline commits are account extensions, not net-new engagements."},
+  {label:"Billable Utilization 87% vs 85%", text:"Services businesses run best at 85-90%. Above 90% creates delivery risk. Below 80% signals underutilization. At 87%, the portfolio is in the optimal operating band."},
+  {label:"AI Attachment Rate 57% vs 60%", text:"8 of 14 accounts have active AI engagements — AI Factory, AI PODs, AI Enablement. The AI services positioning is converting into pipeline, not just narrative."},
+  {label:"Revenue Concentration 54.5% (top 3)", text:"Largest account = 26% of portfolio. This is the most significant portfolio risk. Target of <45% requires new logo additions or accelerated expansion across smaller accounts in H2."},
+  {label:"Avg Engagement Size $326K vs $350K", text:"The mix of large multi-year PODs and smaller support engagements pulls the average down. Target is achievable with conversion of 2-3 larger strategic opps in late-stage negotiation."},
+  {label:"Account Retention 92% vs 90%", text:"No confirmed churn — renewal pipeline active across all accounts. Retention at 92% reflects strong delivery quality and account management across the vertical."},
+  {label:"Pipeline Commit $16.2M vs $18M", text:"Gap represents opps in late-stage negotiation that haven't formally committed yet. Several are verbal-approved but awaiting SOW signature — common in enterprise consulting cycles."},
+  {label:"Active Accounts 14 vs 15", text:"Portfolio concentrated in enterprise tech accounts with renewal-heavy motion. New account additions require partner channel expansion or targeted outbound in adjacent verticals in H2."},
+];
+const ratGrid=document.getElementById('rationaleGrid');
+rationale.forEach((r,i)=>{
+  const card=document.createElement('div');
+  card.className='rationale-card';
+  card.style.animationDelay=`${0.1+i*.05}s`;
+  card.innerHTML=`<div class="rat-label">${r.label}</div><div class="rat-text">${r.text}</div>`;
+  ratGrid.appendChild(card);
+});
+</script>
+</body>
+</html>
