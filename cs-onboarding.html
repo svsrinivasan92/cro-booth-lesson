@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS Onboarding Checklist — Srinivasan Vaidyanathan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --indigo:#1a1464; --indigo-mid:#2d2490; --magenta:#e5007d; --magenta-light:#ff4db2;
+    --cream:#f5f3ee; --white:#ffffff; --slate:#3d3d5c; --slate-light:#6e6e8a;
+    --green:#00c48c; --yellow:#ffb800; --red:#ff4444;
+    --card-bg:#ffffff; --border:rgba(26,20,100,0.08); --shadow:0 2px 20px rgba(26,20,100,0.07);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--indigo); }
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(0,196,140,0.2)}50%{box-shadow:0 0 0 6px rgba(0,196,140,0.1)}}
+
+  header { background:var(--indigo); padding:0 40px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; }
+  .header-name { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; color:#fff; letter-spacing:-0.3px; }
+  .header-right { display:flex; align-items:center; gap:14px; }
+  .nav-link { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); text-decoration:none; padding:5px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.15); transition:all .2s; white-space:nowrap; }
+  .nav-link:hover { color:#fff; border-color:rgba(255,255,255,0.4); }
+  .nav-link.active { background:var(--magenta); color:#fff; border-color:var(--magenta); }
+  .period-badge { font-family:'DM Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase; }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(0,196,140,0.2); animation:pulse 2s infinite; }
+
+  .hero { background:linear-gradient(135deg,var(--indigo) 0%,var(--indigo-mid) 100%); padding:28px 40px 24px; position:relative; overflow:hidden; }
+  .hero::after { content:''; position:absolute; right:-60px; top:-60px; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(229,0,125,0.15) 0%,transparent 70%); pointer-events:none; }
+  .hero-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--magenta-light); margin-bottom:6px; }
+  .hero-title { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--white); letter-spacing:-0.5px; margin-bottom:4px; }
+  .hero-sub { font-size:13px; color:rgba(255,255,255,0.45); font-weight:300; }
+
+  main { padding:28px 40px 48px; max-width:1400px; margin:0 auto; }
+  .section-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--slate-light); margin-bottom:14px; margin-top:28px; display:flex; align-items:center; gap:10px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* PHASE STRIP */
+  .phase-strip { display:flex; gap:0; margin-bottom:28px; opacity:0; animation:fadeUp .4s ease forwards; animation-delay:.05s; }
+  .phase-pip { flex:1; padding:12px 10px; text-align:center; border-right:1px solid rgba(255,255,255,0.15); cursor:pointer; transition:opacity .2s; }
+  .phase-pip:last-child { border-right:none; border-radius:0 10px 10px 0; }
+  .phase-pip:first-child { border-radius:10px 0 0 10px; }
+  .phase-pip:hover { opacity:.85; }
+  .pp-num { font-family:'DM Mono',monospace; font-size:9px; color:rgba(255,255,255,0.5); letter-spacing:1px; margin-bottom:3px; }
+  .pp-name { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:#fff; }
+  .pp-tag { font-size:10px; color:rgba(255,255,255,0.5); margin-top:2px; }
+
+  /* PHASE CARDS */
+  .phases-grid { display:flex; flex-direction:column; gap:16px; }
+  .phase-card { background:var(--card-bg); border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow); overflow:hidden; opacity:0; animation:fadeUp .5s ease forwards; }
+  .phase-header { padding:16px 24px; display:flex; align-items:center; gap:14px; cursor:pointer; user-select:none; }
+  .phase-header:hover { opacity:.9; }
+  .phase-num { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:rgba(255,255,255,0.2); line-height:1; }
+  .phase-title { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:#fff; }
+  .phase-subtitle { font-size:11px; color:rgba(255,255,255,0.5); margin-top:2px; }
+  .phase-meta { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .phase-count { font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:.5px; }
+  .phase-toggle { font-size:18px; color:rgba(255,255,255,0.4); transition:transform .3s; }
+  .phase-toggle.open { transform:rotate(180deg); }
+
+  /* CHECKLIST BODY */
+  .phase-body { display:none; padding:0 24px 20px; }
+  .phase-body.open { display:block; }
+  .category-block { margin-top:16px; }
+  .cat-label { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--indigo); margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+  .cat-label::before { content:''; display:inline-block; width:3px; height:14px; border-radius:2px; background:var(--magenta); }
+  .checklist-items { display:flex; flex-direction:column; gap:6px; }
+  .check-item { display:flex; align-items:flex-start; gap:12px; padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--cream); transition:background .15s; cursor:pointer; }
+  .check-item:hover { background:rgba(26,20,100,0.04); }
+  .check-item.checked { background:rgba(0,196,140,0.05); border-color:rgba(0,196,140,0.2); }
+  .check-item.checked .check-text { color:var(--slate-light); text-decoration:line-through; }
+  .check-box { width:18px; height:18px; border-radius:4px; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+  .check-item.checked .check-box { background:var(--green); border-color:var(--green); }
+  .check-tick { color:#fff; font-size:11px; display:none; }
+  .check-item.checked .check-tick { display:block; }
+  .check-text { font-size:12px; color:var(--slate); line-height:1.5; flex:1; }
+  .check-meta { display:flex; gap:8px; margin-top:4px; }
+  .check-owner { font-family:'DM Mono',monospace; font-size:9px; color:var(--slate-light); background:rgba(26,20,100,0.06); padding:2px 7px; border-radius:8px; }
+
+  /* PROGRESS BAR */
+  .progress-wrap { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:20px 24px; display:flex; align-items:center; gap:20px; margin-bottom:16px; opacity:0; animation:fadeUp .4s ease forwards; animation-delay:.08s; box-shadow:var(--shadow); }
+  .prog-label { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--slate-light); white-space:nowrap; }
+  .prog-track { flex:1; height:8px; background:rgba(26,20,100,0.07); border-radius:10px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,var(--indigo-mid),var(--green)); transition:width .6s ease; }
+  .prog-count { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:var(--indigo); white-space:nowrap; }
+  .prog-pct { font-family:'DM Mono',monospace; font-size:11px; color:var(--slate-light); margin-left:4px; }
+
+  footer { background:var(--indigo); padding:18px 40px; display:flex; align-items:center; justify-content:space-between; margin-top:48px; }
+  .footer-note { font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-name">Srinivasan Vaidyanathan</div>
+  <div class="header-right">
+    <a href="index.html" class="nav-link">← Dashboard</a>
+    <a href="sales-process.html" class="nav-link">Sales Process</a>
+    <span class="nav-link active">CS Onboarding</span>
+    <span class="period-badge">FY2026</span>
+    <div class="live-dot"></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">CRO Playbook · Session 6</div>
+  <div class="hero-title">Customer Success Onboarding Checklist</div>
+  <div class="hero-sub">Hi-Tech Business Vertical · Consulting &amp; AI Services · 6-Phase Model · Interactive</div>
+</div>
+
+<main>
+
+  <!-- PHASE STRIP -->
+  <div class="section-label">Onboarding Phases</div>
+  <div class="phase-strip" id="phaseStrip"></div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <span class="prog-label">Overall Progress</span>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <span class="prog-count" id="progCount">0</span>
+    <span class="prog-pct" id="progPct">/ 0 items</span>
+  </div>
+
+  <!-- PHASE CARDS -->
+  <div class="section-label">Checklist Detail</div>
+  <div class="phases-grid" id="phasesGrid"></div>
+
+</main>
+
+<footer>
+  <span class="footer-note">Srinivasan Vaidyanathan · Chicago Booth CRO Executive Program 2026 · Revenue Strategy &amp; Operations</span>
+  <span class="footer-note">Hi-Tech Vertical · Consulting &amp; AI Services · FY2026</span>
+</footer>
+
+<script>
+const phases = [
+  {
+    label: "Pre-Onboarding", tag: "Before contract sign", color: "#1a1464",
+    categories: [
+      { name: "Sales → CS Handoff", owner: "CS Lead", items: [
+        "CS Lead reviews all deal notes, promised deliverables, and AE handoff brief",
+        "Confirm understanding of client expectations, objectives, and SOW commitments",
+        "Identify key stakeholders: executive sponsor, day-to-day lead, technical contact",
+        "Flag any at-risk commitments or delivery risks from the sales process",
+      ]},
+      { name: "Documentation Review", owner: "CS Lead + Finance", items: [
+        "Review and internalize contract, SOW, SLAs, and engagement terms",
+        "Note any custom terms, conditions, or specific client requirements",
+        "Confirm billing cadence, milestone triggers, and invoice terms with Finance",
+      ]},
+      { name: "Internal Setup", owner: "Delivery Director", items: [
+        "Assign CS Lead, Delivery Director, and Onboarding PM to engagement",
+        "Set up project tooling: project tracker, shared drive, communication channel",
+        "Brief delivery team on client background, AI use case priorities, and success metrics",
+        "Send welcome email from CS Lead to client stakeholders within 24hrs of contract sign",
+      ]},
+    ]
+  },
+  {
+    label: "Kickoff", tag: "Week 1", color: "#2d2490",
+    categories: [
+      { name: "Meeting Prep", owner: "CS Lead", items: [
+        "Set kickoff agenda; share with client 48hrs in advance",
+        "Confirm attendance of executive sponsor and all key client stakeholders",
+        "Prepare onboarding plan, delivery timeline, and milestone overview",
+      ]},
+      { name: "Kickoff Meeting", owner: "CS Lead + Delivery Director", items: [
+        "Introduce full delivery team to client (CS, Delivery Director, team leads)",
+        "Review client goals, success metrics, and definition of done",
+        "Walk through SOW, delivery phases, and key milestones",
+        "Establish communication cadence: weekly status, monthly steering, QBR schedule",
+        "Define escalation path and governance model",
+        "Align on AI use case priorities and data readiness requirements",
+      ]},
+    ]
+  },
+  {
+    label: "Implementation", tag: "Weeks 2–8", color: "#3d3d5c",
+    categories: [
+      { name: "Project Setup", owner: "Delivery Director", items: [
+        "Confirm and distribute project plan with all workstream owners",
+        "Establish access to client systems, data environments, and tooling",
+        "Document and approve technical requirements and architecture decisions",
+        "Launch sprint/delivery cadence; first sprint planning complete",
+      ]},
+      { name: "Governance", owner: "CS Lead", items: [
+        "Weekly status reporting live and shared with client",
+        "Risk register created; initial risks documented and owners assigned",
+        "Change management process agreed and communicated to both teams",
+        "AI data pipeline and model environment setup confirmed (if applicable)",
+      ]},
+    ]
+  },
+  {
+    label: "Training", tag: "Weeks 4–8", color: "#5c5490",
+    categories: [
+      { name: "Training Design", owner: "CS Lead", items: [
+        "Identify training needs by persona: business user, technical lead, executive",
+        "Develop training materials and knowledge transfer plan",
+        "Schedule role-specific training sessions with client teams",
+      ]},
+      { name: "Delivery", owner: "CS Lead + Delivery Team", items: [
+        "Deliver live training sessions by persona group",
+        "Record sessions and make available asynchronously",
+        "Distribute supporting documentation, user guides, and reference materials",
+        "Collect training completion sign-off from client leads",
+      ]},
+    ]
+  },
+  {
+    label: "Pilot", tag: "Weeks 6–10", color: "#7b5ea7",
+    categories: [
+      { name: "Pilot Scoping", owner: "CS Lead + Client", items: [
+        "Define pilot scope: user group, use cases, duration, and success criteria",
+        "Confirm pilot environment is stable and configured correctly",
+        "Brief pilot users on goals, process, and feedback mechanism",
+      ]},
+      { name: "Pilot Execution", owner: "Delivery Director", items: [
+        "Run pilot with defined user group; track usage and adoption",
+        "Collect structured feedback against success criteria",
+        "Document issues, gaps, and resolution plan",
+        "Validate AI model performance against agreed benchmarks (if applicable)",
+        "Confirm readiness for full rollout based on pilot outcomes",
+      ]},
+    ]
+  },
+  {
+    label: "Go-Live", tag: "Week 10+", color: "#00a878",
+    categories: [
+      { name: "Final Checks", owner: "Delivery Director + Client", items: [
+        "Verify all configurations, integrations, and dependencies are functioning",
+        "Confirm data integrity and completeness across all environments",
+        "Complete final UAT sign-off with client technical lead",
+      ]},
+      { name: "Launch", owner: "CS Lead", items: [
+        "Send go-live announcement to all users and stakeholders",
+        "Provide final support instructions, escalation contacts, and SLA reminders",
+        "Confirm support team is briefed and on standby for launch period",
+      ]},
+      { name: "Post-Launch", owner: "CS Lead", items: [
+        "7-day check-in: issues log reviewed, immediate concerns resolved",
+        "30-day review: adoption metrics, NPS pulse, open items closed",
+        "90-day QBR: measure outcomes against success metrics defined at kickoff",
+        "AI model performance review against baseline (if applicable)",
+        "Document lessons learned; update onboarding playbook for next engagement",
+      ]},
+    ]
+  },
+];
+
+// Build phase strip
+const strip = document.getElementById('phaseStrip');
+phases.forEach((p, i) => {
+  const d = document.createElement('div');
+  d.className = 'phase-pip';
+  d.style.background = p.color;
+  d.innerHTML = `<div class="pp-num">0${i+1}</div><div class="pp-name">${p.label}</div><div class="pp-tag">${p.tag}</div>`;
+  d.onclick = () => document.getElementById(`phase-${i}`).scrollIntoView({ behavior:'smooth', block:'start' });
+  strip.appendChild(d);
+});
+
+// Count total items
+const totalItems = phases.reduce((sum, p) => sum + p.categories.reduce((s, c) => s + c.items.length, 0), 0);
+let checkedCount = 0;
+
+function updateProgress() {
+  const pct = Math.round(checkedCount / totalItems * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progCount').textContent = checkedCount;
+  document.getElementById('progPct').textContent = `/ ${totalItems} items · ${pct}%`;
+}
+updateProgress();
+
+// Build phase cards
+const grid = document.getElementById('phasesGrid');
+phases.forEach((phase, pi) => {
+  const card = document.createElement('div');
+  card.className = 'phase-card';
+  card.id = `phase-${pi}`;
+  card.style.animationDelay = `${0.1 + pi * 0.07}s`;
+
+  const totalPhaseItems = phase.categories.reduce((s, c) => s + c.items.length, 0);
+
+  card.innerHTML = `
+    <div class="phase-header" style="background:${phase.color}" onclick="togglePhase(${pi})">
+      <div class="phase-num">0${pi+1}</div>
+      <div>
+        <div class="phase-title">${phase.label}</div>
+        <div class="phase-subtitle">${phase.tag}</div>
+      </div>
+      <div class="phase-meta">
+        <span class="phase-count" id="count-${pi}">0 / ${totalPhaseItems} complete</span>
+        <span class="phase-toggle" id="toggle-${pi}">▾</span>
+      </div>
+    </div>
+    <div class="phase-body ${pi === 0 ? 'open' : ''}" id="body-${pi}">
+      ${phase.categories.map((cat, ci) => `
+        <div class="category-block">
+          <div class="cat-label">${cat.name} <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--slate-light);margin-left:auto;font-weight:400">Owner: ${cat.owner}</span></div>
+          <div class="checklist-items">
+            ${cat.items.map((item, ii) => `
+              <div class="check-item" id="item-${pi}-${ci}-${ii}" onclick="toggleItem(${pi},${ci},${ii})">
+                <div class="check-box"><span class="check-tick">✓</span></div>
+                <div class="check-text">${item}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+
+  grid.appendChild(card);
+  if (pi === 0) document.getElementById(`toggle-${pi}`).classList.add('open');
+});
+
+function togglePhase(pi) {
+  const body = document.getElementById(`body-${pi}`);
+  const toggle = document.getElementById(`toggle-${pi}`);
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+function toggleItem(pi, ci, ii) {
+  const el = document.getElementById(`item-${pi}-${ci}-${ii}`);
+  const wasChecked = el.classList.contains('checked');
+  el.classList.toggle('checked');
+  checkedCount += wasChecked ? -1 : 1;
+
+  // Update phase count
+  const phase = phases[pi];
+  const total = phase.categories.reduce((s, c) => s + c.items.length, 0);
+  let phaseChecked = 0;
+  phase.categories.forEach((cat, ci2) => {
+    cat.items.forEach((_, ii2) => {
+      if (document.getElementById(`item-${pi}-${ci2}-${ii2}`)?.classList.contains('checked')) phaseChecked++;
+    });
+  });
+  document.getElementById(`count-${pi}`).textContent = `${phaseChecked} / ${total} complete`;
+  updateProgress();
+}
+</script>
+</body>
+</html>
