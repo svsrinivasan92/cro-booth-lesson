@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Process — Srinivasan Vaidyanathan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --indigo:#1a1464; --indigo-mid:#2d2490; --magenta:#e5007d; --magenta-light:#ff4db2;
+    --cream:#f5f3ee; --white:#ffffff; --slate:#3d3d5c; --slate-light:#6e6e8a;
+    --green:#00c48c; --yellow:#ffb800; --red:#ff4444;
+    --card-bg:#ffffff; --border:rgba(26,20,100,0.08); --shadow:0 2px 20px rgba(26,20,100,0.07);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--indigo); }
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(0,196,140,0.2)}50%{box-shadow:0 0 0 6px rgba(0,196,140,0.1)}}
+
+  /* ── HEADER ── */
+  header { background:var(--indigo); padding:0 40px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; }
+  .header-name { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; color:#fff; letter-spacing:-0.3px; }
+  .header-right { display:flex; align-items:center; gap:20px; }
+  .period-badge { font-family:'DM Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase; }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(0,196,140,0.2); animation:pulse 2s infinite; }
+
+  /* NAV */
+  .nav-link { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); text-decoration:none; padding:5px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.15); transition:all .2s; }
+  .nav-link:hover { color:#fff; border-color:rgba(255,255,255,0.4); }
+  .nav-link.active { background:var(--magenta); color:#fff; border-color:var(--magenta); }
+
+  /* ── HERO ── */
+  .hero { background:linear-gradient(135deg,var(--indigo) 0%,var(--indigo-mid) 100%); padding:28px 40px 24px; position:relative; overflow:hidden; }
+  .hero::after { content:''; position:absolute; right:-60px; top:-60px; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(229,0,125,0.15) 0%,transparent 70%); pointer-events:none; }
+  .hero-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--magenta-light); margin-bottom:6px; }
+  .hero-title { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--white); letter-spacing:-0.5px; margin-bottom:4px; }
+  .hero-sub { font-size:13px; color:rgba(255,255,255,0.45); font-weight:300; }
+
+  /* ── MAIN ── */
+  main { padding:28px 40px 48px; max-width:1400px; margin:0 auto; }
+  .section-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--slate-light); margin-bottom:14px; margin-top:28px; display:flex; align-items:center; gap:10px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ── STAGE PIPELINE STRIP ── */
+  .pipeline-strip { display:flex; align-items:center; gap:0; margin-bottom:28px; opacity:0; animation:fadeUp .4s ease forwards; animation-delay:.05s; }
+  .pipe-stage { flex:1; background:var(--card-bg); border:1px solid var(--border); padding:10px 14px; text-align:center; position:relative; cursor:pointer; transition:background .15s; }
+  .pipe-stage:first-child { border-radius:10px 0 0 10px; }
+  .pipe-stage:last-child { border-radius:0 10px 10px 0; }
+  .pipe-stage:not(:last-child)::after { content:'›'; position:absolute; right:-10px; top:50%; transform:translateY(-50%); z-index:2; font-size:18px; color:var(--slate-light); }
+  .pipe-stage:hover { background:rgba(26,20,100,0.03); }
+  .pipe-stage.active { background:var(--indigo); }
+  .pipe-stage.active .ps-num,.pipe-stage.active .ps-name,.pipe-stage.active .ps-crm { color:#fff !important; }
+  .ps-num { font-family:'DM Mono',monospace; font-size:9px; color:var(--magenta); letter-spacing:1px; text-transform:uppercase; }
+  .ps-name { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--indigo); margin:2px 0; }
+  .ps-crm { font-size:10px; color:var(--slate-light); }
+
+  /* ── STAGE TABLE ── */
+  .stage-table { width:100%; border-collapse:collapse; background:var(--card-bg); border-radius:12px; overflow:hidden; border:1px solid var(--border); box-shadow:var(--shadow); opacity:0; animation:fadeUp .5s ease forwards; animation-delay:.1s; }
+  .stage-table th { background:var(--indigo); padding:14px 16px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.65); font-weight:400; text-align:left; border-right:1px solid rgba(255,255,255,0.08); white-space:nowrap; }
+  .stage-table th:last-child { border-right:none; }
+  .stage-table th.row-hdr { width:120px; }
+  .stage-table td { padding:16px; font-size:12px; color:var(--slate); border-right:1px solid var(--border); border-bottom:1px solid var(--border); vertical-align:top; line-height:1.6; }
+  .stage-table td:last-child { border-right:none; }
+  .stage-table tr:last-child td { border-bottom:none; }
+  .stage-table td.row-label { background:var(--indigo); color:#fff; font-family:'Syne',sans-serif; font-size:11px; font-weight:700; text-align:center; vertical-align:middle; border-right:1px solid rgba(255,255,255,0.08); width:120px; }
+  .stage-table td.row-label.mg { background:var(--magenta); }
+  .stage-table tr.alt td { background:rgba(26,20,100,0.02); }
+  .stage-table tr.exit td { background:rgba(0,196,140,0.04); }
+
+  /* PROBABILITY BADGES */
+  .prob { display:inline-block; font-family:'Syne',sans-serif; font-size:20px; font-weight:800; }
+  .prob.amber { color:var(--yellow); }
+  .prob.indigo { color:var(--indigo-mid); }
+  .prob.green { color:var(--green); }
+  .prob.slate { color:var(--slate-light); }
+  .prob-sub { font-family:'DM Mono',monospace; font-size:9px; color:var(--slate-light); text-transform:uppercase; letter-spacing:.5px; display:block; margin-top:2px; }
+
+  /* FORECAST PILL */
+  .fc-pill { display:inline-block; font-family:'DM Mono',monospace; font-size:9px; padding:3px 8px; border-radius:10px; background:rgba(26,20,100,0.07); color:var(--indigo-mid); font-weight:500; letter-spacing:.3px; white-space:nowrap; }
+
+  /* EXIT PILL */
+  .exit-pill { display:inline-block; background:rgba(0,196,140,0.1); color:var(--green); font-family:'DM Mono',monospace; font-size:10px; padding:4px 10px; border-radius:8px; font-weight:500; line-height:1.5; }
+
+  /* ACTIVITIES LIST */
+  .act-list { list-style:none; }
+  .act-list li { padding:2px 0; font-size:11.5px; color:var(--slate); line-height:1.5; }
+  .act-list li::before { content:'·'; color:var(--magenta); font-weight:700; margin-right:6px; }
+
+  /* ── BEST PRACTICES ── */
+  .bp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .bp-card { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:16px; opacity:0; animation:fadeUp .4s ease forwards; }
+  .bp-card:nth-child(1){animation-delay:.4s} .bp-card:nth-child(2){animation-delay:.45s} .bp-card:nth-child(3){animation-delay:.5s}
+  .bp-card:nth-child(4){animation-delay:.55s} .bp-card:nth-child(5){animation-delay:.6s} .bp-card:nth-child(6){animation-delay:.65s}
+  .bp-label { font-family:'DM Mono',monospace; font-size:9px; color:var(--magenta); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; font-weight:500; }
+  .bp-text { font-size:11.5px; color:var(--slate); line-height:1.6; }
+
+  footer { background:var(--indigo); padding:18px 40px; display:flex; align-items:center; justify-content:space-between; margin-top:48px; }
+  .footer-note { font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-name">Srinivasan Vaidyanathan</div>
+  <div class="header-right">
+    <a href="index.html" class="nav-link">← Dashboard</a>
+    <span class="nav-link active">Sales Process</span>
+    <span class="period-badge">FY2026 · Hi-Tech</span>
+    <div class="live-dot"></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">CRO Playbook · Session 5</div>
+  <div class="hero-title">Sales Process</div>
+  <div class="hero-sub">Hi-Tech Business Vertical · Consulting &amp; AI Services · Mapped to internal CRM stage definitions · FY2026</div>
+</div>
+
+<main>
+
+  <!-- PIPELINE STRIP -->
+  <div class="section-label">Pipeline Stages Overview</div>
+  <div class="pipeline-strip">
+    <div class="pipe-stage">
+      <div class="ps-num">01</div>
+      <div class="ps-name">Qualifying</div>
+      <div class="ps-crm">Pre-Qual · 3–5%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="ps-num">02</div>
+      <div class="ps-name">Developing</div>
+      <div class="ps-crm">Circle of Influence · 20–30%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="ps-num">03</div>
+      <div class="ps-name">Proposing</div>
+      <div class="ps-crm">Pursue / Gain Commit · 40–50%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="ps-num">04</div>
+      <div class="ps-name">Negotiating</div>
+      <div class="ps-crm">Execute to Close · 80–90%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="ps-num">05</div>
+      <div class="ps-name">Provisioning</div>
+      <div class="ps-crm">Work Ahead · 95–99%</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="ps-num">06</div>
+      <div class="ps-name">Closed</div>
+      <div class="ps-crm">Won / Lost · 100% / 0%</div>
+    </div>
+  </div>
+
+  <!-- STAGE TABLE -->
+  <div class="section-label">Stage Detail</div>
+  <table class="stage-table">
+    <thead>
+      <tr>
+        <th class="row-hdr"></th>
+        <th>Qualifying<br><span style="opacity:.5;font-size:8px">Pre-Qual / Qualifying</span></th>
+        <th>Developing<br><span style="opacity:.5;font-size:8px">Circle of Influence</span></th>
+        <th>Proposing<br><span style="opacity:.5;font-size:8px">Pursue / Gain Commitment</span></th>
+        <th>Negotiating<br><span style="opacity:.5;font-size:8px">Execute to Close</span></th>
+        <th>Provisioning<br><span style="opacity:.5;font-size:8px">All but Sig / Work Ahead</span></th>
+        <th>Closed Won / Lost</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- FORECAST CATEGORY -->
+      <tr class="alt">
+        <td class="row-label">Forecast<br>Category</td>
+        <td><span class="fc-pill">Omitted</span></td>
+        <td><span class="fc-pill">Pipeline</span></td>
+        <td><span class="fc-pill">Pipeline or Best Case</span></td>
+        <td><span class="fc-pill">Best Case to Commit</span></td>
+        <td><span class="fc-pill">Commit</span></td>
+        <td><span class="fc-pill">Closed Won / Closed Lost</span></td>
+      </tr>
+      <!-- PROBABILITY -->
+      <tr>
+        <td class="row-label">Probability<br><span style="font-size:9px;opacity:.6">(CRM)</span></td>
+        <td><span class="prob amber">3–5%</span><span class="prob-sub">Pre-Qual / Qualifying</span></td>
+        <td><span class="prob amber">20–30%</span><span class="prob-sub">Circle of Influence</span></td>
+        <td><span class="prob indigo">40–50%</span><span class="prob-sub">Pursue / Gain Commitment</span></td>
+        <td><span class="prob green">80–90%</span><span class="prob-sub">Execute to Close</span></td>
+        <td><span class="prob green">95–99%</span><span class="prob-sub">Work Ahead Approved</span></td>
+        <td><span class="prob slate">100% / 0%</span><span class="prob-sub">Closed Won / Lost</span></td>
+      </tr>
+      <!-- KEY ACTIVITIES -->
+      <tr class="alt">
+        <td class="row-label mg">Key<br>Activities</td>
+        <td>
+          <ul class="act-list">
+            <li>Schedule initial call; validate ICP fit and service alignment</li>
+            <li>Qualify budget, timeline, scope, and access to power</li>
+            <li>Engage key personas (CTO, VP Eng, CMO) in Hi-Tech account</li>
+            <li>Use intent signals to prioritize outreach</li>
+            <li>Identify AI/automation use case alignment</li>
+            <li>Complete ValuePrompter validation</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="act-list">
+            <li>Build base understanding of opportunity and ValueSelling areas</li>
+            <li>Qualify budget; gain access to economic buyer (Power)</li>
+            <li>Map buying committee and identify internal champion</li>
+            <li>Conduct PoC/PoV scoping with technical stakeholders</li>
+            <li>Gather all ValueSelling information</li>
+            <li>Submit go/no-go for leadership approval</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="act-list">
+            <li>Approved to pursue — assemble full pursuit team</li>
+            <li>Develop proposal, SOW, solution design, and initial estimate</li>
+            <li>Deliver PoC/PoV results and AI use case demonstration</li>
+            <li>Present ROI/business case to economic buyer</li>
+            <li>Client confirms budget and shortlists us as preferred vendor</li>
+            <li>Create initial staffing plan; capacity estimate for Resource Manager</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="act-list">
+            <li>Receive verbal; begin SOW and contract negotiation</li>
+            <li>Navigate multiple rounds of redlines (MSA, SOW, T&Cs)</li>
+            <li>Confirm budget approval, start date, and resource plan</li>
+            <li>Resolve legal, security, and procurement requirements</li>
+            <li>Weekly account review with Resource Manager; soft nominations in place</li>
+            <li>Maintain champion engagement through procurement</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="act-list">
+            <li>All terms agreed; awaiting final signature</li>
+            <li>If Work Ahead: obtain written client notice to bill + internal sign-off</li>
+            <li>Introduce post-sales team: CS, Delivery Director, Onboarding Lead</li>
+            <li>Confirm and book team; finalize resource allocations</li>
+            <li>Build project plan and finalize delivery milestones with client</li>
+            <li>Schedule implementation kickoff meeting</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="act-list">
+            <li><strong>Won:</strong> Confirm team bookings and activate CS onboarding</li>
+            <li>Log win attributes in CRM (size, AI-attached Y/N)</li>
+            <li>Initiate client success plan and reference conversation</li>
+            <li><strong>Lost:</strong> Update Closed Reason in CRM</li>
+            <li>Conduct competitive debrief internally</li>
+            <li>Set re-engage timeline (90–180 days)</li>
+          </ul>
+        </td>
+      </tr>
+      <!-- EXIT CRITERIA -->
+      <tr class="exit">
+        <td class="row-label">Exit<br>Criteria</td>
+        <td><span class="exit-pill">Initial call completed; opportunity identified with budget, timeline, and scope in qualification</span></td>
+        <td><span class="exit-pill">Prospect broadly agrees on scope and high-level close plan; leadership go/no-go approved</span></td>
+        <td><span class="exit-pill">Formal SOW/proposal submitted; client confirms shortlist and states us as preferred vendor</span></td>
+        <td><span class="exit-pill">Verbal approval received; signed contract / fully executed SOW</span></td>
+        <td><span class="exit-pill">Contract signed or Work Ahead formally approved; services provisioned; CS handoff complete</span></td>
+        <td style="color:var(--slate-light);font-style:italic;text-align:center;vertical-align:middle">N/A</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- BEST PRACTICES -->
+  <div class="section-label">Exit Criteria Best Practices</div>
+  <div class="bp-grid">
+    <div class="bp-card">
+      <div class="bp-label">Build into CRM</div>
+      <div class="bp-text">Each stage gate should be a required field or checkbox — not rep judgment. Probabilities should reflect historical close rates, not optimism. What gets measured in the system gets managed in the field.</div>
+    </div>
+    <div class="bp-card">
+      <div class="bp-label">Limit to 1–2 per stage</div>
+      <div class="bp-text">More than two exit criteria per stage and reps either game them or skip them during deal reviews. Keep each gate tight and unambiguous — one measurable buyer action, one measurable seller action.</div>
+    </div>
+    <div class="bp-card">
+      <div class="bp-label">Make them observable</div>
+      <div class="bp-text">"Prospect agreed" is not an exit criterion. "Verbal approval on record" or "signed NDA returned" is. If you can't point to an artifact or an action that happened, the stage hasn't been earned.</div>
+    </div>
+    <div class="bp-card">
+      <div class="bp-label">Split buyer vs. seller actions</div>
+      <div class="bp-text">A seller can complete their side and still be stuck waiting on the buyer. Track both. A deal where the seller has done everything but the buyer has gone quiet is not a Negotiating deal — it's a Developing deal.</div>
+    </div>
+    <div class="bp-card">
+      <div class="bp-label">Inspect every deal review</div>
+      <div class="bp-text">Exit criteria are only as useful as the discipline to enforce them in the forecast call. If a rep can't articulate the exit criterion for the current stage, the deal probability should be questioned immediately.</div>
+    </div>
+    <div class="bp-card">
+      <div class="bp-label">Review quarterly</div>
+      <div class="bp-text">Market conditions, deal cycles, and competitive dynamics shift. Exit criteria written 18 months ago may not reflect how deals actually move today. Quarterly reviews keep the process grounded in current reality, not historical assumptions.</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span class="footer-note">Srinivasan Vaidyanathan · Chicago Booth CRO Executive Program 2026 · Revenue Strategy &amp; Operations</span>
+  <span class="footer-note">Hi-Tech Business Vertical · Consulting &amp; AI Services · FY2026</span>
+</footer>
+
+</body>
+</html>
