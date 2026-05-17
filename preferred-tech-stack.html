@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preferred Tech Stack — Srinivasan Vaidyanathan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --indigo:#1a1464; --indigo-mid:#2d2490; --magenta:#e5007d; --magenta-light:#ff4db2;
+    --cream:#f5f3ee; --white:#ffffff; --slate:#3d3d5c; --slate-light:#6e6e8a;
+    --green:#00c48c; --yellow:#ffb800; --red:#ff4444;
+    --card-bg:#ffffff; --border:rgba(26,20,100,0.08); --shadow:0 2px 20px rgba(26,20,100,0.07);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--indigo); }
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(0,196,140,0.2)}50%{box-shadow:0 0 0 6px rgba(0,196,140,0.1)}}
+
+  header { background:var(--indigo); padding:0 40px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; }
+  .header-name { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; color:#fff; }
+  .header-right { display:flex; align-items:center; gap:12px; }
+  .nav-link { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); text-decoration:none; padding:5px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.15); transition:all .2s; white-space:nowrap; }
+  .nav-link:hover { color:#fff; border-color:rgba(255,255,255,0.4); }
+  .nav-link.active { background:var(--magenta); color:#fff; border-color:var(--magenta); }
+  .period-badge { font-family:'DM Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase; }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(0,196,140,0.2); animation:pulse 2s infinite; }
+
+  .hero { background:linear-gradient(135deg,var(--indigo) 0%,var(--indigo-mid) 100%); padding:28px 40px 24px; position:relative; overflow:hidden; }
+  .hero::after { content:''; position:absolute; right:-60px; top:-60px; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(229,0,125,0.15) 0%,transparent 70%); pointer-events:none; }
+  .hero-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--magenta-light); margin-bottom:6px; }
+  .hero-title { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--white); letter-spacing:-0.5px; margin-bottom:4px; }
+  .hero-sub { font-size:13px; color:rgba(255,255,255,0.45); font-weight:300; }
+
+  main { padding:28px 40px 48px; max-width:1400px; margin:0 auto; }
+  .section-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--slate-light); margin-bottom:14px; margin-top:28px; display:flex; align-items:center; gap:10px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .category-block { margin-bottom:24px; opacity:0; transform:translateY(10px); animation:fadeUp .45s ease forwards; }
+  .cat-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .cat-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .cat-name { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:var(--indigo); }
+  .cat-desc { font-size:11px; color:var(--slate-light); margin-top:1px; }
+
+  .tool-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+  .tool-card { background:var(--card-bg); border-radius:10px; padding:16px 18px; border:1px solid var(--border); box-shadow:var(--shadow); display:flex; gap:12px; align-items:flex-start; }
+  .tool-card.current { border-color:rgba(229,0,125,0.25); background:rgba(229,0,125,0.03); }
+  .tool-card.recommended { border-color:rgba(26,20,100,0.15); }
+  .tool-badge { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px; text-transform:uppercase; padding:2px 6px; border-radius:8px; white-space:nowrap; align-self:flex-start; margin-top:2px; }
+  .badge-current { background:rgba(229,0,125,0.1); color:var(--magenta); }
+  .badge-rec { background:rgba(26,20,100,0.08); color:var(--indigo-mid); }
+  .badge-ai { background:rgba(0,196,140,0.1); color:var(--green); }
+  .tool-info { flex:1; }
+  .tool-name { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--indigo); margin-bottom:3px; }
+  .tool-purpose { font-size:11px; color:var(--slate); line-height:1.5; }
+  .tool-why { font-size:10px; color:var(--slate-light); margin-top:4px; font-style:italic; }
+
+  /* PRINCIPLE CARDS */
+  .principle-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .principle-card { background:var(--card-bg); border-radius:10px; padding:16px; border:1px solid var(--border); box-shadow:var(--shadow); opacity:0; transform:translateY(10px); animation:fadeUp .4s ease forwards; }
+  .p-label { font-family:'DM Mono',monospace; font-size:9px; color:var(--magenta); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+  .p-text { font-size:11.5px; color:var(--slate); line-height:1.6; }
+
+  footer { background:var(--indigo); padding:18px 40px; display:flex; align-items:center; justify-content:space-between; margin-top:48px; }
+  .footer-note { font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-name">Srinivasan Vaidyanathan</div>
+  <div class="header-right">
+    <a href="index.html" class="nav-link">← Playbook</a>
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <span class="nav-link active">Tech Stack</span>
+    <span class="period-badge">FY2026</span>
+    <div class="live-dot"></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">CRO Playbook · Additional Section</div>
+  <div class="hero-title">Preferred Tech Stack</div>
+  <div class="hero-sub">Hi-Tech Business Vertical · Consulting &amp; AI Services · Current + Recommended · FY2026</div>
+</div>
+
+<main>
+
+  <div class="section-label">Stack Overview</div>
+  <div style="background:var(--card-bg);border-radius:10px;padding:20px 24px;border:1px solid var(--border);box-shadow:var(--shadow);opacity:0;animation:fadeUp .4s ease forwards;animation-delay:.05s;font-size:12.5px;color:var(--slate);line-height:1.8;display:flex;gap:32px">
+    <div style="flex:1">The revenue tech stack for a consulting and AI services firm needs to do something product-led tools don't: track relationships, not logins. The current stack is intentionally lean — Salesforce as the system of record and ZoomInfo for data enrichment. The recommended additions fill the gaps in pipeline intelligence, CS operations, and AI-driven forecasting without adding unnecessary complexity.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0;width:300px">
+      <div style="text-align:center;padding:12px;background:rgba(229,0,125,0.05);border-radius:8px;border:1px solid rgba(229,0,125,0.15)"><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--magenta)">2</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--slate-light);margin-top:2px;text-transform:uppercase;letter-spacing:.5px">Current Tools</div></div>
+      <div style="text-align:center;padding:12px;background:rgba(26,20,100,0.04);border-radius:8px;border:1px solid var(--border)"><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--indigo)">6</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--slate-light);margin-top:2px;text-transform:uppercase;letter-spacing:.5px">Recommended</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">CRM &amp; Sales Automation</div>
+  <div class="category-block" style="animation-delay:.1s">
+    <div class="tool-grid">
+      <div class="tool-card current">
+        <span class="tool-badge badge-current">Current</span>
+        <div class="tool-info"><div class="tool-name">Salesforce Sales Cloud</div><div class="tool-purpose">Primary CRM. Pipeline management, opportunity tracking, forecasting, stage automation, and reporting. System of record for all revenue data.</div><div class="tool-why">Non-negotiable foundation. Every other tool should integrate with or feed into Salesforce.</div></div>
+      </div>
+      <div class="tool-card current">
+        <span class="tool-badge badge-current">Current</span>
+        <div class="tool-info"><div class="tool-name">Salesforce Pardot</div><div class="tool-purpose">Marketing automation, lead scoring, nurture campaigns, and marketing attribution. Feeds MQLs into Sales Cloud for AE routing.</div><div class="tool-why">Already in the stack. Underutilised — ABM and lead scoring capabilities not fully activated.</div></div>
+      </div>
+      <div class="tool-card current">
+        <span class="tool-badge badge-current">Current</span>
+        <div class="tool-info"><div class="tool-name">ZoomInfo</div><div class="tool-purpose">Contact and account data enrichment, intent signals, technographic data, and ICP targeting for Hi-Tech accounts.</div><div class="tool-why">Core to prospecting motion. Intent data layer helps AEs prioritise outreach timing.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Revenue Intelligence &amp; Forecasting</div>
+  <div class="category-block" style="animation-delay:.15s">
+    <div class="tool-grid">
+      <div class="tool-card recommended">
+        <span class="tool-badge badge-rec">Recommended</span>
+        <div class="tool-info"><div class="tool-name">Gong</div><div class="tool-purpose">Conversation intelligence — records, transcribes, and analyses sales and CS calls. Surfaces deal risk, competitor mentions, and coaching opportunities.</div><div class="tool-why">In consulting, deals are won and lost in conversations. Gong makes those visible and coachable. Integrates with Salesforce.</div></div>
+      </div>
+      <div class="tool-card recommended">
+        <span class="tool-badge badge-rec">Recommended</span>
+        <div class="tool-info"><div class="tool-name">Clari</div><div class="tool-purpose">AI-driven revenue forecasting, pipeline inspection, and deal scoring. Gives the CRO a single, AI-weighted view of commit vs. best case vs. pipeline.</div><div class="tool-why">Replaces manual forecast rollup. Particularly valuable for a consulting model where deal timing is uncertain and stage probabilities are imprecise.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Customer Success &amp; Health</div>
+  <div class="category-block" style="animation-delay:.2s">
+    <div class="tool-grid">
+      <div class="tool-card recommended">
+        <span class="tool-badge badge-rec">Recommended</span>
+        <div class="tool-info"><div class="tool-name">Gainsight</div><div class="tool-purpose">CS platform for health scoring, success plans, NPS collection, renewal tracking, and automated playbooks. Designed for relationship-led businesses.</div><div class="tool-why">Enables the health scoring model in this playbook. Tracks relationship signals and delivery quality, not just product usage.</div></div>
+      </div>
+      <div class="tool-card recommended">
+        <span class="tool-badge badge-rec">Recommended</span>
+        <div class="tool-info"><div class="tool-name">Totango</div><div class="tool-purpose">Lightweight alternative to Gainsight. Customer journey tracking, health scoring, and CS workflow automation. Lower implementation overhead.</div><div class="tool-why">Better fit if the CS team is small or early-stage. Faster to deploy than Gainsight with less configuration complexity.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">AI &amp; Automation Layer</div>
+  <div class="category-block" style="animation-delay:.25s">
+    <div class="tool-grid">
+      <div class="tool-card recommended">
+        <span class="tool-badge badge-ai">AI Layer</span>
+        <div class="tool-info"><div class="tool-name">6sense</div><div class="tool-purpose">Account-based intelligence platform — identifies in-market accounts using AI, predicts buying stage, and surfaces intent signals before prospects engage.</div><div class="tool-why">Particularly relevant given Hi-Tech vertical focus. Helps AEs prioritise outreach to accounts that are actively evaluating — before they raise their hand.</div></div>
+      </div>
+      <div class="tool-card recommended">
+        <span class="tool-badge badge-ai">AI Layer</span>
+        <div class="tool-info"><div class="tool-name">Salesforce Einstein</div><div class="tool-purpose">Native AI layer within Salesforce — opportunity scoring, lead scoring, activity capture, and predictive forecasting built into the existing CRM.</div><div class="tool-why">Zero integration cost. Activating Einstein on the existing Salesforce instance is the lowest-friction AI uplift available. Start here before adding external AI tools.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Stack Design Principles</div>
+  <div class="principle-grid">
+    <div class="principle-card" style="animation-delay:.35s"><div class="p-label">Salesforce First</div><div class="p-text">Every tool in the stack must integrate with Salesforce Sales Cloud. If it doesn't sync bidirectionally with the CRM, it creates a data silo. The CRO needs one version of truth — not five dashboards.</div></div>
+    <div class="principle-card" style="animation-delay:.4s"><div class="p-label">Relationship Over Product</div><div class="p-text">In consulting, there's no product usage data. Every health and intelligence tool must be evaluated on whether it captures relationship signals — not logins, clicks, or feature adoption.</div></div>
+    <div class="principle-card" style="animation-delay:.45s"><div class="p-label">Activate Before Adding</div><div class="p-text">The current stack has underutilised capabilities — Pardot's ABM features, Salesforce Einstein, ZoomInfo's intent signals. Fully activate what's already paid for before adding new tools to the stack.</div></div>
+    <div class="principle-card" style="animation-delay:.5s"><div class="p-label">AI at Every Layer</div><div class="p-text">The AI services positioning needs to be backed by an AI-enabled revenue stack. Using intent AI (6sense), conversation AI (Gong), and forecasting AI (Clari/Einstein) makes the pitch credible — and keeps the team ahead of clients on AI adoption.</div></div>
+    <div class="principle-card" style="animation-delay:.55s"><div class="p-label">Rep Adoption First</div><div class="p-text">A tool that AEs and CS Leads don't use is worse than no tool — it pollutes data quality. Every addition to the stack should be evaluated on adoption likelihood before ROI. Start with the fewest possible tools.</div></div>
+    <div class="principle-card" style="animation-delay:.6s"><div class="p-label">Measure Stack ROI</div><div class="p-text">Each tool should have a defined metric it owns. Gong owns call quality score. Clari owns forecast accuracy. Gainsight owns health score freshness. If a tool can't be tied to a metric, reconsider the spend.</div></div>
+  </div>
+
+</main>
+
+<footer>
+  <span class="footer-note">Srinivasan Vaidyanathan · Chicago Booth CRO Executive Program 2026 · Revenue Strategy &amp; Operations</span>
+  <span class="footer-note">Hi-Tech Vertical · Consulting &amp; AI Services · Additional Section · FY2026</span>
+</footer>
+
+</body>
+</html>
