@@ -20,10 +20,7 @@
   header { background:var(--indigo); padding:0 40px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; }
   .header-name { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; color:#fff; letter-spacing:-0.3px; }
   .header-right { display:flex; align-items:center; gap:14px; }
-  .nav-link { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); text-decoration:none; padding:5px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.15); transition:all .2s; white-space:nowrap; }
-  .nav-link:hover { color:#fff; border-color:rgba(255,255,255,0.4); }
-  .nav-link.active { background:var(--magenta); color:#fff; border-color:var(--magenta); }
-  .period-badge { font-family:'DM Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase; }
+.period-badge { font-family:'DM Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase; }
   .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(0,196,140,0.2); animation:pulse 2s infinite; }
 
   .hero { background:linear-gradient(135deg,var(--indigo) 0%,var(--indigo-mid) 100%); padding:28px 40px 24px; position:relative; overflow:hidden; }
@@ -88,20 +85,37 @@
 
   footer { background:var(--indigo); padding:18px 40px; display:flex; align-items:center; justify-content:space-between; margin-top:48px; }
   .footer-note { font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:.5px; }
+
+  /* ── NAV ── */
+  .nav-bar { background:rgba(255,255,255,0.06); border-bottom:1px solid rgba(255,255,255,0.08); padding:0 40px; display:flex; align-items:center; gap:4px; height:40px; overflow-x:auto; }
+  .nav-bar::-webkit-scrollbar { display:none; }
+  .nav-tab { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.45); text-decoration:none; padding:6px 14px; border-radius:8px; white-space:nowrap; transition:all .2s; }
+  .nav-tab:hover { color:#fff; background:rgba(255,255,255,0.08); }
+  .nav-tab.active { background:var(--magenta); color:#fff; }
+
 </style>
 </head>
 <body>
 
 <header>
   <div class="header-name">Srinivasan Vaidyanathan</div>
-  <div class="header-right">
-    <a href="index.html" class="nav-link">← Dashboard</a>
-    <a href="sales-process.html" class="nav-link">Sales Process</a>
-    <span class="nav-link active">CS Onboarding</span>
+  <div class="header-right"><span class="nav-link active">CS Onboarding</span>
     <span class="period-badge">FY2026</span>
     <div class="live-dot"></div>
   </div>
 </header>
+  <nav class="nav-bar">
+    <a href="index.html" class="nav-tab ">Playbook</a>
+    <a href="dashboard.html" class="nav-tab ">Dashboard</a>
+    <a href="sales-comp.html" class="nav-tab ">Sales Comp</a>
+    <a href="operating-rhythm.html" class="nav-tab ">Operating Rhythm</a>
+    <a href="lead-routing.html" class="nav-tab ">Lead Routing</a>
+    <a href="sales-process.html" class="nav-tab ">Sales Process</a>
+    <a href="cs-onboarding.html" class="nav-tab active">CS Onboarding</a>
+    <a href="customer-health-scoring.html" class="nav-tab ">Health Scoring</a>
+    <a href="preferred-tech-stack.html" class="nav-tab ">Tech Stack</a>
+  </nav>
+
 
 <div class="hero">
   <div class="hero-label">CRO Playbook · Session 6</div>
